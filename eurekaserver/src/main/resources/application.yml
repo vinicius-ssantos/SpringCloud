@@ -1,0 +1,21 @@
+#nome da aplicacao
+spring:
+  application:
+    name: eurekaserver
+  security:
+    basic:
+      enabled: true
+    user:
+      name: cursoms-eureka-user
+      password: ecok-usr-eeuramssur
+
+# porta onde vai rodar o eureka
+server:
+  port: 8761
+
+# o cliente não irá se registrar automaticamente com o servidor Eureka ao iniciar.
+eureka:
+  client:
+    register-with-eureka: false
+    # o registro dos micro servicos nao serao buscados
+    fetch-registry: false

@@ -1,0 +1,42 @@
+docker network create cursoms-network
+
+docker container stop cursoms-eureka
+docker container rm cursoms-eureka
+docker build --tag cursoms-eureka .
+docker run --name cursoms-eureka -p 8761:8761 --network cursoms-network -d cursoms-eureka
+
+docker container stop cursoms-clientes
+docker container rm cursoms-clientes
+docker build --tag cursoms-clientes . 
+docker run --name cursoms-clientes -P --network cursoms-network  -e EUREKA_SERVER=cursoms-eureka -d cursoms-clientes 
+
+docker container stop cursoms-cartoes
+docker container rm cursoms-cartoes
+docker build --tag cursoms-cartoes . 
+docker run --name cursoms-cartoes -P --network cursoms-network -e RABBITMQ_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -d cursoms-cartoes
+
+
+docker stop cursoms-rabbitmq
+docker container rm cursoms-rabbitmq
+docker build --tag cursoms-rabbitmq . 
+docker run --name cursoms-rabbitmq -p 5672:5672 -p 15672:15672 --network cursoms-network rabbitmq:3.9-management
+## criar queue emissao-cartoes no rabbitmq
+## dar build no projeto mscartoes para atualizar o endereço do rabbitmq
+
+
+
+docker stop cursoms-avaliadorcredito
+docker container rm cursoms-avaliadorcredito
+docker build --tag cursoms-avaliadorcredito . 
+docker run --name cursoms-avaliadorcredito -P --network cursoms-network -e RABBITMQ_SERVER=cursoms-rabbitmq -e EUREKA_SERVER=cursoms-eureka -d cursoms-avaliadorcredito
+
+
+docker stop cursoms-keycloak
+docker container rm cursoms-keycloak
+docker build --tag cursoms-keycloak . 
+docker run --name cursoms-keycloak -p 8081:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin --network cursoms-network quay.io/keycloak/keycloak:18.0.0 start-dev
+
+docker container stop cursoms-gateway
+docker container rm cursoms-gateway
+docker build --tag cursoms-gateway . 
+docker run --name cursoms-gateway -p 8080:8080 -e EUREKA_SERVER=cursoms-eureka -e KEYCLOAK_SERVER=cursoms-keycloak -e KEYCLOAK_PORT=8080 --network cursoms-network -d cursoms-gateway

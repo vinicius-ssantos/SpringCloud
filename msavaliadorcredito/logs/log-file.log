@@ -1,0 +1,22 @@
+2023-12-23 22:34:36.598  INFO 5716 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : Starting MsavaliadorcreditoApplicationTests using Java 17.0.9 on meu-pc with PID 5716 (started by vinic in C:\Users\vinic\Projeto_cursoms\projeto-cursoms\msavaliadorcredito)
+2023-12-23 22:34:36.604  INFO 5716 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2023-12-23 22:34:38.081  INFO 5716 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=74f4aac2-3fe1-3a9e-817b-ea08072eeee1
+2023-12-23 22:34:38.908  INFO 5716 --- [main] o.s.c.openfeign.FeignClientFactoryBean   : For 'msclientes' URL not provided. Will try picking an instance via load-balancing.
+2023-12-23 22:34:39.032  INFO 5716 --- [main] o.s.c.openfeign.FeignClientFactoryBean   : For 'mscartoes' URL not provided. Will try picking an instance via load-balancing.
+2023-12-23 22:34:41.938  INFO 5716 --- [main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2023-12-23 22:34:42.027  WARN 5716 --- [main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2023-12-23 22:34:42.046  INFO 5716 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 17 endpoint(s) beneath base path '/actuator'
+2023-12-23 22:34:42.133  INFO 5716 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : Started MsavaliadorcreditoApplicationTests in 6.093 seconds (JVM running for 7.197)
+2023-12-23 22:34:42.843  INFO 5716 --- [SpringApplicationShutdownHook] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2023-12-23 22:34:42.845  INFO 5716 --- [SpringApplicationShutdownHook] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application MSAVALIADORCREDITO with eureka with status DOWN
+2023-12-23 22:35:57.665  INFO 2124 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : Starting MsavaliadorcreditoApplicationTests using Java 17.0.9 on meu-pc with PID 2124 (started by vinic in C:\Users\vinic\Projeto_cursoms\projeto-cursoms\msavaliadorcredito)
+2023-12-23 22:35:57.667  INFO 2124 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : No active profile set, falling back to 1 default profile: "default"
+2023-12-23 22:35:59.499  INFO 2124 --- [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=74f4aac2-3fe1-3a9e-817b-ea08072eeee1
+2023-12-23 22:36:00.486  INFO 2124 --- [main] o.s.c.openfeign.FeignClientFactoryBean   : For 'msclientes' URL not provided. Will try picking an instance via load-balancing.
+2023-12-23 22:36:00.631  INFO 2124 --- [main] o.s.c.openfeign.FeignClientFactoryBean   : For 'mscartoes' URL not provided. Will try picking an instance via load-balancing.
+2023-12-23 22:36:03.726  INFO 2124 --- [main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2023-12-23 22:36:03.841  WARN 2124 --- [main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2023-12-23 22:36:03.864  INFO 2124 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 17 endpoint(s) beneath base path '/actuator'
+2023-12-23 22:36:03.949  INFO 2124 --- [main] g.v.m.MsavaliadorcreditoApplicationTests : Started MsavaliadorcreditoApplicationTests in 6.902 seconds (JVM running for 8.093)
+2023-12-23 22:36:04.660  INFO 2124 --- [SpringApplicationShutdownHook] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2023-12-23 22:36:04.663  INFO 2124 --- [SpringApplicationShutdownHook] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application MSAVALIADORCREDITO with eureka with status DOWN
