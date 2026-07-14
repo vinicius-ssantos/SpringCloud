@@ -3,6 +3,8 @@ package io.github.viniciusssantos.msclientes.application;
 import io.github.viniciusssantos.msclientes.application.representation.ClienteSaveRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -42,5 +44,10 @@ public class ClienteResource {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(cliente);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleCpfDuplicado(DataIntegrityViolationException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Já existe um cliente cadastrado com o CPF informado");
     }
 }
