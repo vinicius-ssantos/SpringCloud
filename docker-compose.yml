@@ -1,0 +1,93 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      # 8081 is a common collision with other local services; host-side only,
+      # doesn't affect service-to-service calls (those use the container's
+      # internal port 8080 via KEYCLOAK_SERVER/KEYCLOAK_PORT below).
+      - "8181:8080"
+    volumes:
+      # NOTE: keycloack/realm-export.json declares realm "Mscourserealm" (capital M) --
+      # it does NOT match the gateway's issuer-uri, which expects lowercase
+      # "mscourserealm". realm-export-curso.json is the one with the matching name.
+      - ./keycloack/realm-export-curso.json:/opt/keycloak/data/import/realm-export-curso.json:ro
+
+  eurekaserver:
+    build:
+      context: ./eurekaserver
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_USER: cursoms-eureka-user
+      EUREKA_PASSWORD: changeme-local-only
+    restart: on-failure:5
+
+  msclientes:
+    build:
+      context: ./msclientes
+    environment:
+      EUREKA_SERVER: eurekaserver
+      EUREKA_USER: cursoms-eureka-user
+      EUREKA_PASSWORD: changeme-local-only
+    depends_on:
+      - eurekaserver
+    restart: on-failure:5
+
+  mscartoes:
+    build:
+      context: ./mscartoes
+    environment:
+      RABBITMQ_SERVER: rabbitmq
+      EUREKA_SERVER: eurekaserver
+      EUREKA_USER: cursoms-eureka-user
+      EUREKA_PASSWORD: changeme-local-only
+    depends_on:
+      - eurekaserver
+      - rabbitmq
+    restart: on-failure:5
+
+  msavaliadorcredito:
+    build:
+      context: ./msavaliadorcredito
+    environment:
+      RABBITMQ_SERVER: rabbitmq
+      EUREKA_SERVER: eurekaserver
+      EUREKA_USER: cursoms-eureka-user
+      EUREKA_PASSWORD: changeme-local-only
+    depends_on:
+      - eurekaserver
+      - rabbitmq
+      - msclientes
+      - mscartoes
+    restart: on-failure:5
+
+  mscloudgateway:
+    build:
+      context: ./mscloudgateway
+    ports:
+      # Host-side only, chosen to avoid collisions with other local services;
+      # the gateway itself still listens on 8080 inside its container.
+      - "8090:8080"
+    environment:
+      EUREKA_SERVER: eurekaserver
+      EUREKA_USER: cursoms-eureka-user
+      EUREKA_PASSWORD: changeme-local-only
+      KEYCLOAK_SERVER: keycloak
+      KEYCLOAK_PORT: "8080"
+    depends_on:
+      - eurekaserver
+      - keycloak
+      - msclientes
+      - mscartoes
+      - msavaliadorcredito
+    restart: on-failure:5

@@ -18,7 +18,9 @@ mvn -B -ntp package -DskipTests   # full reactor build
 mvn -pl <module> test             # tests for one module, e.g. mvn -pl mscartoes test
 ```
 
-Tests are **not** executed in CI today (`.github/workflows/ci.yml` only runs `package -DskipTests`), because `mscartoes` opens a real RabbitMQ connection at context startup and the gateway may eagerly hit Keycloak's OIDC discovery — neither is available in the CI job. Every module's test suite is currently just an empty `contextLoads()`. If you add real tests that need RabbitMQ/Keycloak, they will not run in CI until that infrastructure is added (Testcontainers or service containers) — say so explicitly rather than assuming green CI means the new tests ran.
+Tests are **not** executed in CI today (`.github/workflows/ci.yml` only runs `package -DskipTests`), because `mscartoes` opens a real RabbitMQ connection at context startup and the gateway may eagerly hit Keycloak's OIDC discovery — neither is available in the CI job. Most modules still only have an empty `contextLoads()`; `msavaliadorcredito` and `mscartoes` also have real Mockito-based unit tests (`AvaliadorCreditoServiceTest`, `EmissaoCartaoSubscriberTest`) that don't need any of that infra and do run fine locally. If you add tests that need RabbitMQ/Keycloak specifically, they will not run in CI until that infrastructure is added (Testcontainers or service containers) — say so explicitly rather than assuming green CI means the new tests ran.
+
+Run the whole stack via `docker compose up -d --build` (`docker-compose.yml` at the repo root) if you need RabbitMQ/Keycloak/Eureka actually running — e.g. to manually verify something these unit tests don't cover. Verified working end-to-end; see `CLAUDE.md` for host ports and the two-realm-file gotcha (`realm-export-curso.json`, not `realm-export.json`).
 
 ## Code style
 
