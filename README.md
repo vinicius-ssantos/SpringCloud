@@ -219,6 +219,31 @@ http://localhost:8081/realms/mscourserealm
 
 ## Running locally
 
+### Quick start with Docker Compose
+
+The fastest way to get the whole system running (RabbitMQ, Keycloak with the realm pre-imported, and all five services):
+
+```bash
+docker compose up -d --build
+```
+
+This was verified end-to-end: all four business services register with Eureka (check `http://cursoms-eureka-user:changeme-local-only@localhost:8761/eureka/apps`), Keycloak imports the `mscourserealm` realm from `keycloack/realm-export-curso.json` automatically, and the gateway (`http://localhost:8090`) enforces JWT auth as expected (a bare request to a protected endpoint gets `401` with `WWW-Authenticate: Bearer`).
+
+Host ports, chosen to avoid colliding with other local services:
+
+| Service | Host port |
+|---|---|
+| `eurekaserver` | 8761 |
+| `rabbitmq` (AMQP / management UI) | 5672 / 15672 |
+| `keycloak` | 8181 (mapped to the container's internal 8080) |
+| `mscloudgateway` | 8090 (mapped to the container's internal 8080) |
+
+`msclientes`, `mscartoes` and `msavaliadorcredito` bind to a random port *inside* their container (`server.port: 0`) and aren't published to the host — they're only reachable through the gateway or via Eureka-based service discovery, consistent with the [security model](#security-model) above.
+
+Tear down with `docker compose down`.
+
+### Running without Docker
+
 ### Requirements
 
 - Java 11+
@@ -298,10 +323,8 @@ The stack currently targets Java 11 and Spring Boot 2.7.x/Spring Cloud 2021.0.x.
 
 ## Next improvements
 
-- Add Docker Compose for Eureka, RabbitMQ, Keycloak and all services
 - Add centralized configuration with Spring Cloud Config
 - Add distributed tracing with Zipkin/OpenTelemetry
 - Add resilience patterns with Resilience4j
 - Add integration tests between services
-- Add GitHub Actions pipeline
 - Improve OpenAPI/Swagger documentation for each service

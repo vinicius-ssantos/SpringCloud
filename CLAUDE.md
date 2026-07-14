@@ -33,6 +33,8 @@ mvn spring-boot:run
 ```
 Startup order matters (each service registers with Eureka and/or depends on RabbitMQ/Keycloak): RabbitMQ → Keycloak → `eurekaserver` → `msclientes` → `mscartoes` → `msavaliadorcredito` → `mscloudgateway`.
 
+Or run the whole stack via `docker compose up -d --build` (`docker-compose.yml` at the repo root) — RabbitMQ, Keycloak (realm auto-imported from `keycloack/realm-export-curso.json` — note the lowercase "mscourserealm", not `realm-export.json`, which has a differently-cased realm name that doesn't match the gateway's issuer-uri), and all five services. Verified working end-to-end. Host ports: eurekaserver 8761, rabbitmq 5672/15672, keycloak 8181, gateway 8090 (chosen to dodge collisions with unrelated local services — internal container ports are the defaults).
+
 CI (`.github/workflows/ci.yml`) only runs `package -DskipTests` on JDK 11 — it does not execute tests. `mscartoes` has a `@RabbitListener` that connects to a real broker at context startup, and the gateway's Keycloak `issuer-uri` may be fetched eagerly, so `contextLoads()` tests fail without those services running. Keep this in mind before wiring `mvn test` into CI — it needs RabbitMQ/Keycloak service containers or Testcontainers first.
 
 Requires JDK 11 specifically — the Lombok version pinned by the Spring Boot 2.6.x/2.7.x parent does not support JDK 21 (confirmed: build fails under JDK 21). Use `.jdks/ms-11.0.31` or equivalent if multiple JDKs are installed locally.
