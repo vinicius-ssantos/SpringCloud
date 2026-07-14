@@ -26,7 +26,7 @@ This repository demonstrates common patterns used in distributed systems:
 - OAuth2/JWT resource server configuration with Keycloak
 - Actuator endpoints for observability
 - H2 database for local persistence in services
-- OpenAPI dependency support in microservices
+- OpenAPI/Swagger UI documentation in three of the microservices (see [API documentation](#api-documentation-swagger--openapi))
 
 ---
 
@@ -121,6 +121,24 @@ This is a deliberate trade-off for a study project, not an oversight: it assumes
 | GET | `/avaliacoes-credito/situacao-cliente?cpf={cpf}` | Gets the customer credit situation |
 | POST | `/avaliacoes-credito` | Evaluates customer credit based on CPF and income |
 | POST | `/avaliacoes-credito/solicitacoes-cartao` | Requests card issuance through messaging |
+
+---
+
+## API documentation (Swagger / OpenAPI)
+
+`msclientes`, `mscartoes` and `msavaliadorcredito` each expose Swagger UI and the raw OpenAPI document (via `springdoc-openapi-ui`):
+
+```txt
+GET /swagger-ui/index.html
+GET /v3/api-docs
+```
+
+Verified working directly: started `msclientes` standalone and confirmed both return real content (`swagger-ui/index.html` renders the actual Swagger UI page, `/v3/api-docs` returns a valid OpenAPI 3.0.1 document listing the service's real endpoints) — not just that the dependency is present.
+
+Two things to know before trying it:
+
+- These three services bind to a **random port** by default (`server.port: 0`), so there's no fixed URL to paste in a browser. Check the service's own startup log line (`Tomcat started on port(s): ...`) or look it up in the Eureka dashboard (`http://localhost:8761`, requires the `EUREKA_USER`/`EUREKA_PASSWORD` credentials described above) to find the actual port for a given run.
+- **Not reachable through `docker compose up` as configured today** — those three services don't publish their ports to the host (see "Quick start with Docker Compose" above), so Swagger UI is only accessible when running a service directly with `mvn spring-boot:run` (or by overriding `server.port` and publishing it yourself).
 
 ---
 
