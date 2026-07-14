@@ -9,7 +9,7 @@ Java/Spring Cloud microservices study project simulating a credit-card evaluatio
 ## Setup / environment
 
 - JDK **11** required. The Lombok version pinned by the Spring Boot 2.6.x/2.7.x parent breaks under JDK 21 — confirmed by direct build failure. If multiple JDKs are installed, select the JDK 11 one explicitly (`JAVA_HOME`) before running Maven.
-- Each module has its own `mvnw`; the wrapper jar under `eurekaserver/.mvn/wrapper/` is currently broken (0 bytes) — use a system Maven install or another module's wrapper against the root `pom.xml` until that's fixed.
+- A single Maven wrapper lives at the repo root (`./mvnw`, `./mvnw.cmd`) covering the whole reactor — there are no per-module wrappers anymore. Run it from the root, e.g. `./mvnw -pl mscartoes -am test`.
 
 ## Build & test
 

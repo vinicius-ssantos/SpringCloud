@@ -37,6 +37,8 @@ CI (`.github/workflows/ci.yml`) only runs `package -DskipTests` on JDK 11 — it
 
 Requires JDK 11 specifically — the Lombok version pinned by the Spring Boot 2.6.x/2.7.x parent does not support JDK 21 (confirmed: build fails under JDK 21). Use `.jdks/ms-11.0.31` or equivalent if multiple JDKs are installed locally.
 
+A single Maven wrapper lives at the repo root (`./mvnw`, `./mvnw.cmd`) covering the whole reactor — there are no per-module wrappers.
+
 ## Architecture
 
 - **Sync path**: `msavaliadorcredito` → Feign clients (`ClienteResourceClient`, `CartoeesResourceClient`) → `msclientes` / `mscartoes`, resolved via Eureka service discovery (`lb://` in the gateway, service-name-based in Feign `@FeignClient(value = "...")`).
