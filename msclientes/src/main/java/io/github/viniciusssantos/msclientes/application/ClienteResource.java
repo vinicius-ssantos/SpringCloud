@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
@@ -26,7 +27,7 @@ public class ClienteResource {
 //        return "OK";
 //    }
     @PostMapping
-    public ResponseEntity save(@RequestBody ClienteSaveRequest request) {
+    public ResponseEntity save(@Valid @RequestBody ClienteSaveRequest request) {
         var cliente = request.toModel();
         service.save(cliente);
         URI headerLocation = ServletUriComponentsBuilder

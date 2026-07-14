@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ public class CartoesResource {
 
 
 @PostMapping
-    public ResponseEntity cadastra(@RequestBody CartaoSaveRequest request){
+    public ResponseEntity cadastra(@Valid @RequestBody CartaoSaveRequest request){
         Cartao cartao = request.toModel();
         cartaoService.save(cartao);
         return ResponseEntity.status(HttpStatus.CREATED).build();
