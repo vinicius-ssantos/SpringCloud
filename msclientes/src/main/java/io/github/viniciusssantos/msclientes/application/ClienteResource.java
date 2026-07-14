@@ -29,7 +29,7 @@ public class ClienteResource {
         service.save(cliente);
         URI headerLocation = ServletUriComponentsBuilder
                 .fromCurrentRequest()
-                .query("cpf=`{cpf}")
+                .query("cpf={cpf}")
                 .buildAndExpand(cliente.getCpf())
                 .toUri();
         return ResponseEntity.created(headerLocation).build();
