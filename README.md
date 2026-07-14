@@ -279,6 +279,23 @@ Each service has its own Spring Boot application, configuration file and Maven b
 
 ---
 
+## Modernization plan (Java 21 / Spring Boot 3.x)
+
+The stack currently targets Java 11 and Spring Boot 2.7.x/Spring Cloud 2021.0.x. Both are viable choices for a while longer, and this project deliberately migrates last, after the basics are solid — a migration is much safer once there's real test coverage to catch regressions, so it follows test coverage and CI improvements rather than preceding them.
+
+**Why not now:** the Lombok version pinned by the Spring Boot 2.6.x/2.7.x parent does not support JDK 21 — confirmed by a direct build failure when compiling this project with JDK 21 installed as the active JDK. Migrating the JDK alone, without also moving to Spring Boot 3.x, isn't an option.
+
+**What the Boot 2.7 → 3.x jump actually breaks here** (mapped against this codebase, not generic migration notes):
+
+- `javax.persistence` → `jakarta.persistence` in every JPA entity (`Cliente`, `Cartao`, `ClienteCartao`, and others using `javax.persistence.*` imports).
+- `WebSecurityConfigurerAdapter` (used in `eurekaserver`'s `SecurityConfig`) is removed in Spring Security 6; needs rewriting as a `SecurityFilterChain` bean.
+- `springdoc-openapi-ui` 1.6.8 → the 2.x line (different artifact id and auto-configuration).
+- `spring-cloud-dependencies` 2021.0.x → the 2023.x train, which is what pairs with Spring Boot 3.x.
+
+**Suggested sequence:** align Spring Boot/Cloud versions across modules (done), fix runtime bugs, add input validation and error handling (done), grow real test coverage, then migrate. With a small codebase like this one and tests in place beforehand, the actual migration is estimated at 1-2 days; attempting it before there's test coverage to lean on would make regressions much harder to catch.
+
+---
+
 ## Next improvements
 
 - Add Docker Compose for Eureka, RabbitMQ, Keycloak and all services
