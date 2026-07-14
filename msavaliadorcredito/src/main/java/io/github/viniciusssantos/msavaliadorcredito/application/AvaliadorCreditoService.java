@@ -43,12 +43,12 @@ public class AvaliadorCreditoService {
                     .cliente(dadosClietesResponse.getBody())
                     .cartoes(cartoesResponse.getBody())
                     .build();
-        } catch (FeignException.FeignClientException e) {
+        } catch (FeignException e) {
             int status = e.status();
             if (HttpStatus.NOT_FOUND.value() == status) {
                 throw new DadosClienteNotFoundException();
             }
-            throw new ErrosComunicacaoMicroservicoException(e.getMessage(), status);
+            throw new ErrosComunicacaoMicroservicoException(e.getMessage(), status > 0 ? status : HttpStatus.BAD_GATEWAY.value());
         }
     }
 
@@ -76,12 +76,12 @@ public class AvaliadorCreditoService {
             return new RetornoAvaliacaoCliente(listaCartoesAprovados);
 
 
-        } catch (FeignException.FeignClientException e) {
+        } catch (FeignException e) {
             int status = e.status();
             if (HttpStatus.NOT_FOUND.value() == status) {
                 throw new DadosClienteNotFoundException();
             }
-            throw new ErrosComunicacaoMicroservicoException(e.getMessage(), status);
+            throw new ErrosComunicacaoMicroservicoException(e.getMessage(), status > 0 ? status : HttpStatus.BAD_GATEWAY.value());
         }
     }
 
