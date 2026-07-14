@@ -14,11 +14,11 @@ Java/Spring Cloud microservices study project simulating a credit-card evaluatio
 ## Build & test
 
 ```
-mvn -B -ntp package -DskipTests   # full reactor build
+mvn -B -ntp test                  # full reactor build + test
 mvn -pl <module> test             # tests for one module, e.g. mvn -pl mscartoes test
 ```
 
-Tests are **not** executed in CI today (`.github/workflows/ci.yml` only runs `package -DskipTests`), because `mscartoes` opens a real RabbitMQ connection at context startup and the gateway may eagerly hit Keycloak's OIDC discovery — neither is available in the CI job. Most modules still only have an empty `contextLoads()`; `msavaliadorcredito` and `mscartoes` also have real Mockito-based unit tests (`AvaliadorCreditoServiceTest`, `EmissaoCartaoSubscriberTest`) that don't need any of that infra and do run fine locally. If you add tests that need RabbitMQ/Keycloak specifically, they will not run in CI until that infrastructure is added (Testcontainers or service containers) — say so explicitly rather than assuming green CI means the new tests ran.
+CI (`.github/workflows/ci.yml`) runs `mvn test` for real, no `-DskipTests`. An earlier assumption that `mscartoes`' `@RabbitListener` and the gateway's Keycloak OIDC discovery lookup would block context startup without a real broker/IdP turned out to be wrong — verified with neither running, both locally and on GitHub's runner. Most modules still only have an empty `contextLoads()`; `msavaliadorcredito` and `mscartoes` also have real Mockito-based unit tests (`AvaliadorCreditoServiceTest`, `EmissaoCartaoSubscriberTest`). If you add tests that genuinely need a live RabbitMQ/Keycloak (not just a client bean that tolerates connection failure), they will not run in CI until that infrastructure is added (Testcontainers or service containers) — say so explicitly rather than assuming green CI means the new tests ran.
 
 Run the whole stack via `docker compose up -d --build` (`docker-compose.yml` at the repo root) if you need RabbitMQ/Keycloak/Eureka actually running — e.g. to manually verify something these unit tests don't cover. Verified working end-to-end; see `CLAUDE.md` for host ports and the two-realm-file gotcha (`realm-export-curso.json`, not `realm-export.json`).
 
@@ -36,6 +36,7 @@ Run the whole stack via `docker compose up -d --build` (`docker-compose.yml` at 
 
 ## Before opening a PR
 
-- Check open GitHub issues first — this repo has a tracked backlog (issues #3–#19) from a full review covering version drift across module `pom.xml`s, missing input validation, RabbitMQ error handling, Dockerfile issues, and test coverage. Don't re-report or re-fix something already tracked without checking.
-- Run the reactor build (`mvn package -DskipTests`) before committing — there is no local pre-commit hook enforcing this.
-- Reference the issue number being addressed in the PR description.
+- Check open GitHub issues first in case something's already tracked (the original review backlog, issues #3–#19, is fully resolved — don't assume those items are still open).
+- Run the reactor build and tests (`mvn test`) before committing — there is no local pre-commit hook enforcing this.
+- Reference the issue number being addressed in the PR description, if any.
+- Dependabot may open PRs with major-version dependency jumps (e.g. straight to Spring Boot 3.x/4.x-era artifacts) — don't merge those without a real migration effort; see "Modernization plan" in the README.
