@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("avaliacoes-credito")
 @RequiredArgsConstructor
@@ -34,7 +36,7 @@ public class AvaliadorCreditoController {
 
 
     @PostMapping
-    public ResponseEntity<?> realizarAvaliacoes(@RequestBody DadosAvaliacao dados) {
+    public ResponseEntity<?> realizarAvaliacoes(@Valid @RequestBody DadosAvaliacao dados) {
 
         try {
             RetornoAvaliacaoCliente retornoAvaliacaoCliente = avaliadorCreditoService.realizarAvaliacao(dados.getCpf(), dados.getRenda());
@@ -48,7 +50,7 @@ public class AvaliadorCreditoController {
     }
 
     @PostMapping("solicitacoes-cartao")
-    public ResponseEntity<?> solicitarCartao(@RequestBody DadosSolicitacaoEmissaoCartao dados) {
+    public ResponseEntity<?> solicitarCartao(@Valid @RequestBody DadosSolicitacaoEmissaoCartao dados) {
         try {
             ProtocoloSolicitacaoCartao protocoloSolicitacaoCartao = avaliadorCreditoService
                     .solicitarEmissaoDeCartao(dados);
