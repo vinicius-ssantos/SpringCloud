@@ -1,0 +1,16 @@
+version: 2
+updates:
+  # Multi-module Maven reactor: pointing at the root pom.xml is enough,
+  # Dependabot follows the <modules> list to check every module's
+  # dependencies (eurekaserver, mscloudgateway, msclientes, mscartoes,
+  # msavaliadorcredito) even though none of them use it as a Maven parent.
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
