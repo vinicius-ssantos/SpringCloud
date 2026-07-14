@@ -12,7 +12,7 @@ RUN mvn clean package -DskipTests
 
 
 # Estágio 2: Estágio Final
-FROM openjdk:11
+FROM eclipse-temurin:11-jre
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -22,6 +22,10 @@ COPY --from=build ./app/target/*.jar ./app.jar
 
 # Expõe a porta 8761
 EXPOSE 8761
+
+# Roda como usuário não-root
+RUN useradd --uid 10001 --no-create-home appuser && chown appuser:appuser /app/app.jar
+USER appuser
 
 # Especifica o comando a ser executado ao iniciar o contêiner
 ENTRYPOINT java -jar app.jar

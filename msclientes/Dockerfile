@@ -12,7 +12,7 @@ RUN mvn clean package -DskipTests
 
 
 # Estágio 2: Estágio Final
-FROM openjdk:11
+FROM eclipse-temurin:11-jre
 
 # Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
@@ -21,6 +21,12 @@ WORKDIR /app
 COPY --from=build ./app/target/*.jar ./app.jar
 
 
-ARG EUREKA_SERVER=localhost
+# ENV (não ARG): precisa sobreviver no container em execução, não só no build
+ENV EUREKA_SERVER=localhost
+
+# Roda como usuário não-root
+RUN useradd --uid 10001 --no-create-home appuser && chown appuser:appuser /app/app.jar
+USER appuser
+
 # Especifica o comando a ser executado ao iniciar o contêiner
 ENTRYPOINT java -jar -Dspring.profiles.active=production app.jar
