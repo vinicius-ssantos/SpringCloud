@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,5 +26,9 @@ public class CartaoService {
     public List<Cartao> getCartoesRendaMenorIgual(Long renda){
         var rendaBigDecimal = BigDecimal.valueOf(renda);
         return repository.findByRendaLessThanEqual(rendaBigDecimal);
+    }
+
+    public Optional<Cartao> getPorId(Long id){
+        return repository.findById(id);
     }
 }

@@ -46,4 +46,12 @@ public class CartoesResource {
     return ResponseEntity.ok(resultList);
 }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CartaoResponse> getPorId(@PathVariable("id") Long id){
+        return cartaoService.getPorId(id)
+                .map(CartaoResponse::fromModel)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

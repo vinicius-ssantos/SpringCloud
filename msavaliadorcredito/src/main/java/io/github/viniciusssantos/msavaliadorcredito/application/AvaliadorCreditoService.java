@@ -85,6 +85,17 @@ public class AvaliadorCreditoService {
 
     public ProtocoloSolicitacaoCartao solicitarEmissaoDeCartao(DadosSolicitacaoEmissaoCartao dados) {
         try {
+            // O limite liberado nunca vem do chamador -- é recalculado aqui com a
+            // mesma regra de realizarAvaliacao, para que quem solicita o cartão
+            // não possa definir o próprio limite de crédito.
+            DadosCliente dadosCliente = clienteResourceClient.dadosClientes(dados.getCpf()).getBody();
+            Cartao cartao = cartoesResourceClient.getCartaoPorId(dados.getIdCartao()).getBody();
+
+            BigDecimal idadeBD = BigDecimal.valueOf(dadosCliente.getIdade());
+            BigDecimal fator = idadeBD.divide(BigDecimal.valueOf(10));
+            BigDecimal limiteAprovado = fator.multiply(cartao.getLimiteBasico());
+            dados.setLimiteLiberado(limiteAprovado);
+
             emissaoCartaoPublisher.solicitarCartao(dados);
             var protocol = UUID.randomUUID().toString();
             return new ProtocoloSolicitacaoCartao(protocol);

@@ -15,6 +15,7 @@ public class DadosSolicitacaoEmissaoCartao {
     private String cpf;
     @NotBlank
     private String endereco;
-    @NotNull
+    // Não validado como obrigatório: o valor é sempre recalculado no servidor
+    // em solicitarEmissaoDeCartao, nunca aceito do chamador.
     private BigDecimal limiteLiberado;
 }
