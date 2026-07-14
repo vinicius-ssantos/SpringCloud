@@ -2,7 +2,6 @@ package io.github.viniciusssantos.msclientes.application;
 
 import io.github.viniciusssantos.msclientes.application.representation.ClienteSaveRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,17 +14,10 @@ import java.net.URI;
 @RestController
 @RequestMapping("clientes")
 @RequiredArgsConstructor
-@Slf4j
 public class ClienteResource {
 
     private final ClienteService service;
 
-
-//    @GetMapping
-//    public String status(){
-//        log.info("Obtendo  o status do microservico de clientes");
-//        return "OK";
-//    }
     @PostMapping
     public ResponseEntity save(@Valid @RequestBody ClienteSaveRequest request) {
         var cliente = request.toModel();

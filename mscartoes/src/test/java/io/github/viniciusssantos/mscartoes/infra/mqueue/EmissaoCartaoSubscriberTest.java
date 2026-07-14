@@ -3,7 +3,7 @@ package io.github.viniciusssantos.mscartoes.infra.mqueue;
 import io.github.viniciusssantos.mscartoes.domain.BandeiraCartao;
 import io.github.viniciusssantos.mscartoes.domain.Cartao;
 import io.github.viniciusssantos.mscartoes.domain.ClienteCartao;
-import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRespository;
+import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRepository;
 import io.github.viniciusssantos.mscartoes.infra.repository.ClienteCartaoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 class EmissaoCartaoSubscriberTest {
 
     @Mock
-    private CartaoRespository cartaoRespository;
+    private CartaoRepository cartaoRepository;
     @Mock
     private ClienteCartaoRepository clienteCartaoRepository;
 
@@ -35,7 +35,7 @@ class EmissaoCartaoSubscriberTest {
     @Test
     void receberSolicitacaoEmissao_persisteClienteCartaoParaPayloadValido() {
         Cartao cartao = new Cartao("Gold", BandeiraCartao.VISA, BigDecimal.valueOf(5000), BigDecimal.valueOf(1000));
-        when(cartaoRespository.findById(1L)).thenReturn(Optional.of(cartao));
+        when(cartaoRepository.findById(1L)).thenReturn(Optional.of(cartao));
 
         String payload = "{\"idCartao\":1,\"cpf\":\"12345678900\",\"endereco\":\"Rua A\",\"limiteLiberado\":800}";
 
@@ -57,7 +57,7 @@ class EmissaoCartaoSubscriberTest {
 
     @Test
     void receberSolicitacaoEmissao_rejeitaSemRequeueQuandoCartaoNaoExiste() {
-        when(cartaoRespository.findById(99L)).thenReturn(Optional.empty());
+        when(cartaoRepository.findById(99L)).thenReturn(Optional.empty());
         String payload = "{\"idCartao\":99,\"cpf\":\"12345678900\",\"endereco\":\"Rua A\",\"limiteLiberado\":800}";
 
         assertThrows(AmqpRejectAndDontRequeueException.class,

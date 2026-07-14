@@ -5,7 +5,6 @@ import io.github.viniciusssantos.msavaliadorcredito.application.exception.DadosC
 import io.github.viniciusssantos.msavaliadorcredito.application.exception.ErroSolicitacaoCartaoException;
 import io.github.viniciusssantos.msavaliadorcredito.application.exception.ErrosComunicacaoMicroservicoException;
 import io.github.viniciusssantos.msavaliadorcredito.domain.model.*;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

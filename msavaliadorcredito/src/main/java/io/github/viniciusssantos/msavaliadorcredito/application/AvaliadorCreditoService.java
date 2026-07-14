@@ -6,11 +6,9 @@ import io.github.viniciusssantos.msavaliadorcredito.application.exception.ErroSo
 import io.github.viniciusssantos.msavaliadorcredito.application.exception.ErrosComunicacaoMicroservicoException;
 import io.github.viniciusssantos.msavaliadorcredito.domain.model.*;
 import io.github.viniciusssantos.msavaliadorcredito.infra.clients.Cartao;
-import io.github.viniciusssantos.msavaliadorcredito.infra.clients.CartoeesResourceClient;
+import io.github.viniciusssantos.msavaliadorcredito.infra.clients.CartoesResourceClient;
 import io.github.viniciusssantos.msavaliadorcredito.infra.clients.ClienteResourceClient;
 import io.github.viniciusssantos.msavaliadorcredito.infra.mqueue.SolicitacaoEmissaoCartaoPublisher;
-import jdk.security.jarsigner.JarSignerException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
 public class AvaliadorCreditoService {
 
     private final ClienteResourceClient clienteResourceClient;
-    private final CartoeesResourceClient cartoeesResourceClient;
+    private final CartoesResourceClient cartoesResourceClient;
     private final SolicitacaoEmissaoCartaoPublisher emissaoCartaoPublisher;
 
 
@@ -36,7 +34,7 @@ public class AvaliadorCreditoService {
             //obterDadosCliente -MSCLIENTES
             //obter cartoes dos clientes MSCARTOES
             ResponseEntity<DadosCliente> dadosClietesResponse = clienteResourceClient.dadosClientes(cpf);
-            ResponseEntity<List<CartaoCliente>> cartoesResponse = cartoeesResourceClient.getCartoesByCliente(cpf);
+            ResponseEntity<List<CartaoCliente>> cartoesResponse = cartoesResourceClient.getCartoesByCliente(cpf);
 
             return SituacaoCliente
                     .builder()
@@ -55,7 +53,7 @@ public class AvaliadorCreditoService {
     public RetornoAvaliacaoCliente realizarAvaliacao(String cpf, Long renda) throws DadosClienteNotFoundException, ErrosComunicacaoMicroservicoException {
         try {
             ResponseEntity<DadosCliente> dadosClietesResponse = clienteResourceClient.dadosClientes(cpf);
-            ResponseEntity<List<Cartao>> cartoesResponse = cartoeesResourceClient.getCartoesRendaAteh(renda);
+            ResponseEntity<List<Cartao>> cartoesResponse = cartoesResourceClient.getCartoesRendaAteh(renda);
             List<Cartao> cartoes = cartoesResponse.getBody();
 
             var listaCartoesAprovados = cartoes.stream().map(cartao -> {
