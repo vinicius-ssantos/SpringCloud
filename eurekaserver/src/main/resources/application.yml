@@ -6,8 +6,10 @@ spring:
     basic:
       enabled: true
     user:
-      name: cursoms-eureka-user
-      password: ecok-usr-eeuramssur
+      # Local-dev defaults so `mvn spring-boot:run` still works out of the box.
+      # Override EUREKA_USER / EUREKA_PASSWORD for any real deployment.
+      name: ${EUREKA_USER:cursoms-eureka-user}
+      password: ${EUREKA_PASSWORD:changeme-local-only}
 
 # porta onde vai rodar o eureka
 server:
