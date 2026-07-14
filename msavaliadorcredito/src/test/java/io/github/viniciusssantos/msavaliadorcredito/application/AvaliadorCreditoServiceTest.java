@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,12 +89,44 @@ class AvaliadorCreditoServiceTest {
     }
 
     @Test
-    void solicitarEmissaoDeCartao_encapsulaFalhaDoPublisherComoErroDeNegocio() throws Exception {
+    void solicitarEmissaoDeCartao_recalculaLimiteIgnorandoOValorEnviadoPeloChamador() throws Exception {
+        var dadosCliente = new DadosCliente();
+        dadosCliente.setIdade(40);
+
+        var cartao = new Cartao();
+        cartao.setLimiteBasico(BigDecimal.valueOf(1000));
+
+        when(clienteResourceClient.dadosClientes(anyString())).thenReturn(ResponseEntity.ok(dadosCliente));
+        when(cartoesResourceClient.getCartaoPorId(anyLong())).thenReturn(ResponseEntity.ok(cartao));
+
         var dados = new DadosSolicitacaoEmissaoCartao();
         dados.setIdCartao(1L);
         dados.setCpf("12345678900");
         dados.setEndereco("Rua A");
-        dados.setLimiteLiberado(BigDecimal.valueOf(500));
+        dados.setLimiteLiberado(BigDecimal.valueOf(999999)); // valor forjado pelo chamador -- deve ser ignorado
+
+        service.solicitarEmissaoDeCartao(dados);
+
+        // fator = idade / 10 = 4; limiteAprovado = fator * limiteBasico = 4 * 1000
+        assertThat(dados.getLimiteLiberado()).isEqualByComparingTo(BigDecimal.valueOf(4000));
+        verify(emissaoCartaoPublisher).solicitarCartao(dados);
+    }
+
+    @Test
+    void solicitarEmissaoDeCartao_encapsulaFalhaDoPublisherComoErroDeNegocio() throws Exception {
+        var dadosCliente = new DadosCliente();
+        dadosCliente.setIdade(30);
+
+        var cartao = new Cartao();
+        cartao.setLimiteBasico(BigDecimal.valueOf(500));
+
+        when(clienteResourceClient.dadosClientes(anyString())).thenReturn(ResponseEntity.ok(dadosCliente));
+        when(cartoesResourceClient.getCartaoPorId(anyLong())).thenReturn(ResponseEntity.ok(cartao));
+
+        var dados = new DadosSolicitacaoEmissaoCartao();
+        dados.setIdCartao(1L);
+        dados.setCpf("12345678900");
+        dados.setEndereco("Rua A");
 
         doThrow(new RuntimeException("fila indisponivel")).when(emissaoCartaoPublisher).solicitarCartao(dados);
 
