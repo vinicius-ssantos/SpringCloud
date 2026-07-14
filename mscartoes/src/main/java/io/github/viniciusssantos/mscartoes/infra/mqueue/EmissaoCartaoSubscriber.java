@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.viniciusssantos.mscartoes.domain.Cartao;
 import io.github.viniciusssantos.mscartoes.domain.ClienteCartao;
 import io.github.viniciusssantos.mscartoes.domain.DadosSolicitacaoEmissaoCartao;
-import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRespository;
+import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRepository;
 import io.github.viniciusssantos.mscartoes.infra.repository.ClienteCartaoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class EmissaoCartaoSubscriber {
 
-    private final CartaoRespository cartaoRespository;
+    private final CartaoRepository cartaoRepository;
     private final ClienteCartaoRepository clienteCartaoRepository;
 
     @RabbitListener(queues = "${mq.queues.emissao-cartoes}")
@@ -28,7 +28,7 @@ public class EmissaoCartaoSubscriber {
             DadosSolicitacaoEmissaoCartao dados =
                     mapper.readValue(payload, DadosSolicitacaoEmissaoCartao.class);
 
-            Cartao cartao = cartaoRespository.findById(dados.getIdCartao())
+            Cartao cartao = cartaoRepository.findById(dados.getIdCartao())
                     .orElseThrow(() -> new IllegalArgumentException(
                             "Cartao nao encontrado para o id " + dados.getIdCartao()));
             ClienteCartao clienteCartao = new ClienteCartao();

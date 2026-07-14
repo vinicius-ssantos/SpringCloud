@@ -1,6 +1,7 @@
 package io.github.viniciusssantos.mscartoes.application;
 
 
+import io.github.viniciusssantos.mscartoes.application.representation.CartaoResponse;
 import io.github.viniciusssantos.mscartoes.application.representation.CartoesPorClienteResponse;
 import io.github.viniciusssantos.mscartoes.domain.Cartao;
 import io.github.viniciusssantos.mscartoes.domain.ClienteCartao;
@@ -31,9 +32,10 @@ public class CartoesResource {
     }
 
     @GetMapping(params = "renda")
-    public ResponseEntity<List<Cartao>> getCartoesRendaAteh(@RequestParam("renda") Long renda){
+    public ResponseEntity<List<CartaoResponse>> getCartoesRendaAteh(@RequestParam("renda") Long renda){
         List<Cartao> list = cartaoService.getCartoesRendaMenorIgual(renda);
-        return ResponseEntity.ok(list);
+        List<CartaoResponse> resultList = list.stream().map(CartaoResponse::fromModel).collect(Collectors.toList());
+        return ResponseEntity.ok(resultList);
     }
 
 @GetMapping(params = "cpf")

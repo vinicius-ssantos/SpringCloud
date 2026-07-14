@@ -1,7 +1,6 @@
 package io.github.viniciusssantos.msavaliadorcredito.infra.clients;
 
 
-import feign.Response;
 import io.github.viniciusssantos.msavaliadorcredito.domain.model.CartaoCliente;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @FeignClient(value = "mscartoes",path = "/cartoes")
-public interface CartoeesResourceClient {
+public interface CartoesResourceClient {
 
     @GetMapping(params = "cpf")
     public ResponseEntity<List<CartaoCliente>> getCartoesByCliente(@RequestParam("cpf") String cpf);

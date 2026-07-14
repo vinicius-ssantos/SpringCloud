@@ -2,7 +2,7 @@ package io.github.viniciusssantos.mscartoes.application;
 
 
 import io.github.viniciusssantos.mscartoes.domain.Cartao;
-import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRespository;
+import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartaoService {
 
-    private final CartaoRespository repository;
+    private final CartaoRepository repository;
 
 
     @Transactional

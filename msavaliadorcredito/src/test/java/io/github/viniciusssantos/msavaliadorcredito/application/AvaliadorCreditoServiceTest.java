@@ -8,7 +8,7 @@ import io.github.viniciusssantos.msavaliadorcredito.domain.model.DadosCliente;
 import io.github.viniciusssantos.msavaliadorcredito.domain.model.DadosSolicitacaoEmissaoCartao;
 import io.github.viniciusssantos.msavaliadorcredito.domain.model.RetornoAvaliacaoCliente;
 import io.github.viniciusssantos.msavaliadorcredito.infra.clients.Cartao;
-import io.github.viniciusssantos.msavaliadorcredito.infra.clients.CartoeesResourceClient;
+import io.github.viniciusssantos.msavaliadorcredito.infra.clients.CartoesResourceClient;
 import io.github.viniciusssantos.msavaliadorcredito.infra.clients.ClienteResourceClient;
 import io.github.viniciusssantos.msavaliadorcredito.infra.mqueue.SolicitacaoEmissaoCartaoPublisher;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class AvaliadorCreditoServiceTest {
     @Mock
     private ClienteResourceClient clienteResourceClient;
     @Mock
-    private CartoeesResourceClient cartoeesResourceClient;
+    private CartoesResourceClient cartoesResourceClient;
     @Mock
     private SolicitacaoEmissaoCartaoPublisher emissaoCartaoPublisher;
 
@@ -57,7 +57,7 @@ class AvaliadorCreditoServiceTest {
         cartao.setLimiteBasico(BigDecimal.valueOf(1000));
 
         when(clienteResourceClient.dadosClientes(anyString())).thenReturn(ResponseEntity.ok(dadosCliente));
-        when(cartoeesResourceClient.getCartoesRendaAteh(anyLong())).thenReturn(ResponseEntity.ok(List.of(cartao)));
+        when(cartoesResourceClient.getCartoesRendaAteh(anyLong())).thenReturn(ResponseEntity.ok(List.of(cartao)));
 
         RetornoAvaliacaoCliente retorno = service.realizarAvaliacao("12345678900", 5000L);
 
