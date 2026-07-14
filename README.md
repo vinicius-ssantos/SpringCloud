@@ -1,8 +1,8 @@
 # Spring Cloud Microservices
 
 ![Java](https://img.shields.io/badge/Java-11-orange?style=for-the-badge&logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.0-brightgreen?style=for-the-badge&logo=springboot)
-![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2021.0.1-brightgreen?style=for-the-badge&logo=spring)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7.18-brightgreen?style=for-the-badge&logo=springboot)
+![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-2021.0.9-brightgreen?style=for-the-badge&logo=spring)
 ![Eureka](https://img.shields.io/badge/Eureka-Service%20Discovery-blue?style=for-the-badge)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange?style=for-the-badge&logo=rabbitmq)
 ![Keycloak](https://img.shields.io/badge/Keycloak-Auth-blue?style=for-the-badge&logo=keycloak)
@@ -73,8 +73,8 @@ The microservices use random ports and register themselves in Eureka. The gatewa
 ## Tech stack
 
 - Java 11
-- Spring Boot 2.7.0
-- Spring Cloud 2021.0.1
+- Spring Boot 2.7.18
+- Spring Cloud 2021.0.9
 - Spring Web
 - Spring Data JPA
 - Spring Cloud Netflix Eureka
