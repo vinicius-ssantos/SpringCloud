@@ -70,6 +70,14 @@ The microservices use random ports and register themselves in Eureka. The gatewa
 
 ---
 
+## Security model
+
+Only `mscloudgateway` validates JWTs (OAuth2 resource server backed by Keycloak). `msclientes`, `mscartoes` and `msavaliadorcredito` have no authentication layer of their own — they trust that every request they receive already went through the gateway.
+
+This is a deliberate trade-off for a study project, not an oversight: it assumes the three business services are never reachable directly from outside the deployment (e.g. isolated on a private Docker network with only the gateway's port published), so the gateway is the sole point where JWTs are checked. If a service is exposed directly — as it is by default when running everything with plain `mvn spring-boot:run` on `localhost` — that service accepts unauthenticated requests. Don't rely on this setup as-is for anything beyond local experimentation.
+
+---
+
 ## Tech stack
 
 - Java 11
