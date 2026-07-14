@@ -44,29 +44,78 @@ This repository demonstrates common patterns used in distributed systems:
 
 ## Architecture
 
-```txt
-Client
-  |
-  v
-API Gateway - mscloudgateway :8080
-  |
-  v
-Eureka Server - eurekaserver :8761
-  |
-  |-- msclientes
-  |-- mscartoes
-  |-- msavaliadorcredito
+```mermaid
+flowchart TB
+    Client(["Client"])
+    Keycloak[/"Keycloak<br/>OAuth2 Provider :8081"/]
+    Gateway["mscloudgateway<br/>API Gateway :8080"]
+    Eureka[["eurekaserver<br/>Service Discovery :8761"]]
+    Clientes["msclientes<br/>Customer Service"]
+    Cartoes["mscartoes<br/>Card Service"]
+    Avaliador["msavaliadorcredito<br/>Credit Evaluator"]
+    Rabbit{{"RabbitMQ<br/>emissao-cartoes queue"}}
 
-RabbitMQ
-  |
-  |-- asynchronous card issuing queue: emissao-cartoes
+    Client -->|"HTTPS + JWT"| Gateway
+    Gateway -.->|"validates JWT"| Keycloak
+    Gateway -->|"lb://"| Clientes
+    Gateway -->|"lb://"| Cartoes
+    Gateway -->|"lb://"| Avaliador
 
-Keycloak
-  |
-  |-- OAuth2/JWT issuer for gateway security
+    Clientes -.->|"registers"| Eureka
+    Cartoes -.->|"registers"| Eureka
+    Avaliador -.->|"registers"| Eureka
+    Gateway -.->|"discovers"| Eureka
+
+    Avaliador -->|"Feign (sync)"| Clientes
+    Avaliador -->|"Feign (sync)"| Cartoes
+    Avaliador ==>|"publish (async)"| Rabbit
+    Rabbit ==>|"consume (async)"| Cartoes
 ```
 
+Solid arrows = gateway routing / synchronous Feign calls · dotted arrows = Eureka registration/discovery · thick arrows = asynchronous RabbitMQ messaging.
+
 The microservices use random ports and register themselves in Eureka. The gateway uses service discovery to route requests by service name.
+
+### Sequence: credit evaluation + card issuance
+
+The most representative flow in the project — combines the synchronous evaluation path with the asynchronous issuance path. Note that `limiteLiberado` is always recomputed by `msavaliadorcredito` before publishing to the queue, never accepted as-is from the request.
+
+```mermaid
+sequenceDiagram
+    actor Client
+    participant GW as mscloudgateway
+    participant AV as msavaliadorcredito
+    participant CL as msclientes
+    participant CT as mscartoes
+    participant MQ as RabbitMQ
+
+    rect rgb(240, 248, 255)
+    Note over Client,CT: Credit evaluation (synchronous)
+    Client->>GW: POST /avaliacoes-credito (cpf, renda) + JWT
+    GW->>AV: routes to msavaliadorcredito
+    AV->>CL: GET /clientes?cpf= (Feign)
+    CL-->>AV: DadosCliente (idade)
+    AV->>CT: GET /cartoes?renda= (Feign)
+    CT-->>AV: List Cartao (limiteBasico)
+    AV->>AV: limiteAprovado = (idade / 10) * limiteBasico
+    AV-->>Client: RetornoAvaliacaoCliente
+    end
+
+    rect rgb(255, 248, 240)
+    Note over Client,MQ: Card issuance (async)
+    Client->>GW: POST /avaliacoes-credito/solicitacoes-cartao + JWT
+    GW->>AV: routes to msavaliadorcredito
+    AV->>CL: GET /clientes?cpf= (Feign)
+    CL-->>AV: DadosCliente (idade)
+    AV->>CT: GET /cartoes/id (Feign)
+    CT-->>AV: Cartao (limiteBasico)
+    Note right of AV: limiteLiberado recomputed here,<br/>never trusted from the request
+    AV-)MQ: publish DadosSolicitacaoEmissaoCartao
+    AV-->>Client: ProtocoloSolicitacaoCartao
+    MQ--)CT: consume message
+    CT->>CT: persist ClienteCartao
+    end
+```
 
 ---
 
