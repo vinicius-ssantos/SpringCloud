@@ -180,12 +180,7 @@ Content-Type: application/json
 http://localhost:8761
 ```
 
-Default Eureka credentials configured in the project:
-
-```txt
-username: cursoms-eureka-user
-password: ecok-usr-eeuramssur
-```
+Eureka's basic-auth credentials are externalized via `EUREKA_USER` / `EUREKA_PASSWORD` environment variables. The local-dev defaults (`cursoms-eureka-user` / `changeme-local-only`) let `mvn spring-boot:run` and `docker compose up` work out of the box — set both env vars explicitly for anything beyond local experimentation; don't treat the defaults as real credentials.
 
 ### Gateway
 
@@ -215,6 +210,8 @@ Gateway resource server issuer URI:
 http://localhost:8081/realms/mscourserealm
 ```
 
+The realm this points at is exported at `keycloack/realm-export-curso.json` (note the directory is spelled "keycloack", not "keycloak" — a typo baked into the repo layout). If you're importing it manually into a standalone Keycloak instance rather than using `docker compose` (which does this automatically), use that specific file: `keycloack/realm-export.json` also exists but declares the realm as `"Mscourserealm"` (capital M) — importing it instead gives you a realm name that doesn't match the issuer-uri above, and the gateway won't be able to validate tokens against it.
+
 ---
 
 ## Running locally
@@ -241,6 +238,8 @@ Host ports, chosen to avoid colliding with other local services:
 `msclientes`, `mscartoes` and `msavaliadorcredito` bind to a random port *inside* their container (`server.port: 0`) and aren't published to the host — they're only reachable through the gateway or via Eureka-based service discovery, consistent with the [security model](#security-model) above.
 
 Tear down with `docker compose down`.
+
+Each module also has its own standalone `Dockerfile` if you need to build/run a single service's image directly (e.g. `docker build -t mscartoes ./mscartoes`) instead of the full compose stack. They're multi-stage builds (Maven build stage, `eclipse-temurin:11-jre` runtime stage) and run as a non-root user.
 
 ### Running without Docker
 
