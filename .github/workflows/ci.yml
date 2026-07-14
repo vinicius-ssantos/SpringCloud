@@ -27,11 +27,16 @@ jobs:
           java-version: "11"
           cache: maven
 
-      # Test *execution* is intentionally skipped for now: `mscartoes` has a
-      # @RabbitListener that connects to a real broker on context startup,
-      # and the gateway's Keycloak issuer-uri may be fetched eagerly too.
-      # Neither service is available in this job yet. Compiling test sources
-      # still catches compile-time breakage; wiring up service containers
-      # (RabbitMQ, Keycloak) so tests actually run is tracked separately.
-      - name: Build all modules (compile + package, tests compiled but not run)
-        run: mvn -B -ntp package -DskipTests
+      # Tests now run for real. The assumption that mscartoes'
+      # @RabbitListener and the gateway's Keycloak issuer-uri lookup block
+      # context startup (and thus require a real broker/IdP in this job)
+      # turned out not to hold: Spring AMQP's listener container retries
+      # the broker connection asynchronously in the background instead of
+      # failing context refresh, and the resource server's issuer lookup
+      # doesn't block startup either -- verified locally with neither
+      # RabbitMQ nor Keycloak running. This CI run is the first real
+      # confirmation on GitHub's runner; if it goes red for connectivity
+      # reasons unrelated to actual test failures, that's the signal to
+      # add Testcontainers instead of reverting to -DskipTests silently.
+      - name: Build all modules and run tests
+        run: mvn -B -ntp test
