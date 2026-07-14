@@ -1,6 +1,5 @@
 package io.github.viniciusssantos.mscartoes.infra.mqueue;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.viniciusssantos.mscartoes.domain.Cartao;
 import io.github.viniciusssantos.mscartoes.domain.ClienteCartao;
@@ -8,14 +7,15 @@ import io.github.viniciusssantos.mscartoes.domain.DadosSolicitacaoEmissaoCartao;
 import io.github.viniciusssantos.mscartoes.infra.repository.CartaoRespository;
 import io.github.viniciusssantos.mscartoes.infra.repository.ClienteCartaoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class EmissaoCartaoSubscriber {
 
     private final CartaoRespository cartaoRespository;
@@ -28,14 +28,17 @@ public class EmissaoCartaoSubscriber {
             DadosSolicitacaoEmissaoCartao dados =
                     mapper.readValue(payload, DadosSolicitacaoEmissaoCartao.class);
 
-            Cartao cartao = cartaoRespository.findById(dados.getIdCartao()).orElseThrow();
+            Cartao cartao = cartaoRespository.findById(dados.getIdCartao())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Cartao nao encontrado para o id " + dados.getIdCartao()));
             ClienteCartao clienteCartao = new ClienteCartao();
             clienteCartao.setCartao(cartao);
             clienteCartao.setCpf(dados.getCpf());
             clienteCartao.setLimite(dados.getLimiteLiberado());
             clienteCartaoRepository.save(clienteCartao);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("Falha ao processar solicitacao de emissao de cartao: {}", payload, e);
+            throw new AmqpRejectAndDontRequeueException(e);
         }
     }
 }
